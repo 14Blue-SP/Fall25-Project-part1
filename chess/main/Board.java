@@ -13,12 +13,10 @@ public class Board extends JPanel{
   
 
   public void paintComponent(Graphics g){
-    Graphics2D gfx = (Graphics2D) g;
-
     for(int rank = 0; rank < ranks; rank++){
       for(int file = 0; file < files; file++){
-        gfx.setColor((rank + file) % 2 == 0 ? Color.white : Color.gray);
-        gfx.fillRect(file*tileSize, rank*tileSize, tileSize, tileSize);
+        g.setColor((rank + file) % 2 == 0 ? Color.white : Color.gray);
+        g.fillRect(file*tileSize, rank*tileSize, tileSize, tileSize);
       }
     }
   }
