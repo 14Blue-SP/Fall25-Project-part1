@@ -2,12 +2,12 @@ package chess.model;
 
 import java.awt.Image;
 import java.util.List;
+import java.util.Stack;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.ImageIcon;
 
-import chess.move.Move;
 import chess.move.PieceMove;
 import chess.pieces.Piece;
 
@@ -15,6 +15,7 @@ public class GameModel {
   private static GameModel INSTANCE = new GameModel();
   private String[] board = new String[64];
   private List<GameModelListener> listeners = new ArrayList<>();
+  private Stack<String> moveHistory = new Stack<>();
 
   public Image pieceImage = new ImageIcon("chess/pieces.png").getImage();
   public int imageScale = pieceImage.getWidth(null) / 6;
@@ -59,6 +60,7 @@ public class GameModel {
 
   public void clearBoard(){
     Arrays.fill(board, " ");
+    moveHistory.clear();
   }
 
   public String[] getBoard(){
@@ -74,14 +76,76 @@ public class GameModel {
   }
 
   public void printBoard(){
+    System.out.println();
     for(int i = 0; i < board.length; i+=8){
-      System.out.println(Arrays.toString(Arrays.copyOfRange(board, i, i+8)));
+      System.out.println((8-(i/8))+Arrays.toString(Arrays.copyOfRange(board, i, i+8)));
     } 
+    System.out.println("  a, b, c, d, e, f, g, h");
+    System.out.println();
   }
 
-  public Move makeMove(Piece piece, int file, int rank){
-    // Logic to make a move on the board
+  public boolean isLegalMove(PieceMove move){
+    if(Alliance(move.piece, move.capturedPiece)){
+      return false;
+    }
+
+    return true;
+  }
+
+  public void makeMove(PieceMove move){
+    setPiece(getIndex(move.piece.col, move.piece.row), " ");
+    String piece = getAbbrivation(move.piece.name);
+    setPiece(getIndex(move.col, move.row), move.piece.isWhite ? piece.toUpperCase() :piece.toLowerCase());
+    recordMove(move);
     notifyListeners();
-    return new PieceMove(getInstance());
+    System.out.println(moveHistory.peek());
+    printBoard();
+  }
+
+  private boolean Alliance(Piece p1, Piece p2){
+    if(p1==null || p2 == null){
+      return false;
+    }
+    return p1.isWhite == p2.isWhite;
+  }
+
+  private String getAbbrivation(String name){
+    switch(name.toLowerCase()){
+      case "pawn": return "P";
+      case "rook": return "R";
+      case "knight": return "N";
+      case "bishop": return "B";
+      case "queen": return "Q";
+      case "king": return "K";
+      default: return " ";
+    }
+  }
+
+  public String getSquare(int col, int row){
+    return ""+(char)(97+col)+(8-row);
+  }
+
+  private void recordMove(PieceMove move){
+    String moveNotation = "";
+    // future: break into separate stacks for white and black
+    moveNotation += move.piece.isWhite ? "White ": "Black ";
+
+    if(!move.piece.name.equals("Pawn")){
+      moveNotation += getAbbrivation(move.piece.name);
+    }
+    if(move.capturedPiece != null){
+      if(move.piece.name.equals("Pawn")){
+        moveNotation += (char)(97+move.piece.col);
+      }
+      moveNotation += "x";
+    }
+    moveNotation += getSquare(move.col, move.row);
+
+    // 0-0 for kingside castle
+    // 0-0-0 for queenside castle (not implemented)
+    // + for check, # for checkmate (not implemented)
+    // e.p. for en passant (not implemented)
+    // =Q, =R, =B, =N for promotion (not implemented)
+    moveHistory.push(moveNotation);
   }
 }

@@ -9,6 +9,6 @@ public class Rook extends Piece {
     this.yPos = row * board.tileSize;
     this.name = "Rook";
     this.value = 3;
-    this.spriteIndex = 5;
+    this.spriteIndex = 4;
   }
 }

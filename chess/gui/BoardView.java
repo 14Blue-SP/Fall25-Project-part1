@@ -14,12 +14,20 @@ public class BoardView extends JPanel implements GameModelListener {
   protected int files = 8, ranks = 8;
 
   private ArrayList<Piece> pieces = new ArrayList<>();
+
+  public Piece selectedPiece = null;
+
+  private Input input = new Input(this);
   
   public BoardView(int width){
     GameModel.getInstance().newGame();
     this.tileSize = (int)(width*0.9)/ files;
     this.setPreferredSize(new Dimension(files*tileSize, ranks*tileSize));
     placePieces();
+
+    this.addMouseListener(input);
+    this.addMouseMotionListener(input);
+
     GameModel.getInstance().printBoard();
     GameModel.getInstance().addListener(this);
   }
@@ -52,6 +60,15 @@ public class BoardView extends JPanel implements GameModelListener {
     }
   }
 
+  public Piece getPieceAt(int file, int rank){
+    for(Piece piece : pieces){
+      if(piece.col == file && piece.row == rank){
+        return piece;
+      }
+    }
+    return null;
+  }
+
   public void paintComponent(Graphics gfx){
     for(int rank = 0; rank < ranks; rank++){
       for(int file = 0; file < files; file++){
@@ -65,11 +82,11 @@ public class BoardView extends JPanel implements GameModelListener {
     }
   }
 
-
   @Override
   public void gameStateChanged() {
-    System.out.print(this.getClass().getSimpleName()+"--");
-    System.out.println(new Throwable().getStackTrace()[0].getMethodName());
+    //System.out.print(this.getClass().getSimpleName()+"--");
+    //System.out.println(new Throwable().getStackTrace()[0].getMethodName());
+    placePieces();
     repaint();
   }
 }
