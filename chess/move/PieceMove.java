@@ -1,6 +1,5 @@
 package chess.move;
 
-import chess.gui.BoardView;
 import chess.model.GameModel;
 import chess.pieces.Piece;
 
@@ -11,18 +10,20 @@ public class PieceMove implements Move {
   public int row;
 
   public Piece piece;
-  public Piece capturedPiece;
+  public Piece capture;
+
+  public String specialMove = "";
 
   public PieceMove(GameModel gameModel){
     this.gameModel = gameModel;
   }
 
   @Override
-  public void move(BoardView boardView, Piece piece, int col, int row) {
+  public void move(Piece piece, int col, int row) {
     // Implementation of the move method
     this.piece = piece;
     this.col = col;
     this.row = row;
-    this.capturedPiece = boardView.getPieceAt(col, row);
+    this.capture = GameModel.getInstance().getPieceAt(col, row);
   }
 }

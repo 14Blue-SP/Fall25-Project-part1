@@ -4,7 +4,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import chess.model.GameModel;
-import chess.move.Move;
 import chess.move.PieceMove;
 import chess.pieces.Piece;
 
@@ -20,7 +19,7 @@ public class Input extends MouseAdapter {
   public void mousePressed(MouseEvent e) {
     int file = e.getX() / boardView.tileSize;
     int rank = e.getY() / boardView.tileSize;
-    Piece piece = boardView.getPieceAt(file, rank);
+    Piece piece = GameModel.getInstance().getPieceAt(file, rank);
     if(piece != null){
       boardView.selectedPiece = piece;
     }
@@ -43,12 +42,17 @@ public class Input extends MouseAdapter {
     
     if(boardView.selectedPiece != null){
       PieceMove move = new PieceMove(GameModel.getInstance());
-      move.move(boardView, boardView.selectedPiece, file, rank);
+      move.move(boardView.selectedPiece, file, rank);
       
       if(GameModel.getInstance().isLegalMove(move)){
         GameModel.getInstance().makeMove(move);
       }
+
+      boardView.selectedPiece.xPos = boardView.selectedPiece.col * boardView.tileSize;
+      boardView.selectedPiece.yPos = boardView.selectedPiece.row * boardView.tileSize;
+
       boardView.selectedPiece = null;
+      boardView.repaint();
     }
   }
 }

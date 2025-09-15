@@ -2,9 +2,11 @@ package chess.pieces;
 
 import java.awt.Graphics;
 
+import chess.gui.BoardView;
 import chess.model.GameModel;
 
 public class Piece {
+  public BoardView board;
   public int col, row;
   public int xPos, yPos;
 
@@ -20,6 +22,14 @@ public class Piece {
     this.col = col;
     this.row = row;
     this.isWhite = isWhite;
+  }
+
+  public boolean isValidMove(int col, int row){
+    return true;
+  }
+
+  public boolean pieceCollision(int col, int row){
+    return false;
   }
 
   @Override

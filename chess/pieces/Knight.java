@@ -11,4 +11,9 @@ public class Knight extends Piece {
     this.value = 3;
     this.spriteIndex = 3;
   }
+
+  @Override
+  public boolean isValidMove(int col, int row){
+    return Math.abs(this.col - col) * Math.abs(this.row - row) == 2;
+  }
 }

@@ -10,15 +10,19 @@ import javax.swing.ImageIcon;
 
 import chess.move.PieceMove;
 import chess.pieces.Piece;
+import chess.pieces.Queen;
 
 public class GameModel {
   private static GameModel INSTANCE = new GameModel();
   private String[] board = new String[64];
+  private ArrayList<Piece> pieces = new ArrayList<>();
   private List<GameModelListener> listeners = new ArrayList<>();
   private Stack<String> moveHistory = new Stack<>();
 
   public Image pieceImage = new ImageIcon("chess/pieces.png").getImage();
   public int imageScale = pieceImage.getWidth(null) / 6;
+
+  public int enPassantSquare = -1;
 
   public static GameModel getInstance(){
     return INSTANCE;
@@ -75,6 +79,10 @@ public class GameModel {
     return row*8 + col;
   }
 
+  public ArrayList<Piece> getPieces(){
+    return pieces;
+  } 
+
   public void printBoard(){
     System.out.println();
     for(int i = 0; i < board.length; i+=8){
@@ -85,21 +93,60 @@ public class GameModel {
   }
 
   public boolean isLegalMove(PieceMove move){
-    if(Alliance(move.piece, move.capturedPiece)){
+    if(Alliance(move.piece, move.capture)){
       return false;
     }
-
+    if(!move.piece.isValidMove(move.col, move.row)){
+      return false;
+    }
+    if(move.piece.pieceCollision(move.col, move.row)){
+      return false;
+    }
     return true;
   }
 
   public void makeMove(PieceMove move){
-    setPiece(getIndex(move.piece.col, move.piece.row), " ");
     String piece = getAbbrivation(move.piece.name);
-    setPiece(getIndex(move.col, move.row), move.piece.isWhite ? piece.toUpperCase() :piece.toLowerCase());
+    
+    if(move.piece.name.equals("Pawn")){
+      // en passant
+      int direction = move.piece.isWhite ? 1:-1;
+      if(getIndex(move.col, move.row)== enPassantSquare){
+        move.capture = getPieceAt(move.col, move.row + direction);
+        setPiece(getIndex(move.capture.col, move.capture.row), " ");
+        move.specialMove = "ep";
+      }
+      if(Math.abs(move.piece.row - move.row) == 2){
+        enPassantSquare = getIndex(move.col, move.row + direction);
+      } else {
+        enPassantSquare = -1;
+      }
+
+      // Promotion -- always promote to queen (need to implement choice later)
+      int promotionRank = move.piece.isWhite ? 0:7;
+      if(move.row == promotionRank){
+        pieces.add(new Queen(move.piece.board, move.col, move.row, move.piece.isWhite));
+        capture(move.piece);
+        piece = "Q";
+        move.specialMove = "prom";
+      }
+    }
+    setPiece(getIndex(move.piece.col, move.piece.row), " ");
+    setPiece(getIndex(move.col, move.row), move.piece.isWhite ? piece.toUpperCase():piece.toLowerCase());
     recordMove(move);
+    move.piece.col = move.col;
+    move.piece.row = move.row;
+    if(move.piece.isFirstMove){
+      move.piece.isFirstMove = false;
+    }
+    capture(move.capture);
     notifyListeners();
     System.out.println(moveHistory.peek());
     printBoard();
+  }
+
+  private void capture(Piece piece){
+    pieces.remove(piece);
   }
 
   private boolean Alliance(Piece p1, Piece p2){
@@ -121,8 +168,17 @@ public class GameModel {
     }
   }
 
+  public Piece getPieceAt(int file, int rank){
+    for(Piece piece : pieces){
+      if(piece.col == file && piece.row == rank){
+        return piece;
+      }
+    }
+    return null;
+  }
+
   public String getSquare(int col, int row){
-    return ""+(char)(97+col)+(8-row);
+    return ""+(char)('a'+col)+(8-row);
   }
 
   private void recordMove(PieceMove move){
@@ -133,19 +189,27 @@ public class GameModel {
     if(!move.piece.name.equals("Pawn")){
       moveNotation += getAbbrivation(move.piece.name);
     }
-    if(move.capturedPiece != null){
+    if(move.capture != null){
       if(move.piece.name.equals("Pawn")){
-        moveNotation += (char)(97+move.piece.col);
+        moveNotation += (char)('a'+move.piece.col);
       }
       moveNotation += "x";
     }
     moveNotation += getSquare(move.col, move.row);
 
+    // en passant
+    if(move.specialMove.equals("ep")){
+      moveNotation += " e.p.";
+    }
+
+    // promotion -- =R, =B, =N (not implemented)
+    if(move.specialMove.equals("prom")){
+      moveNotation += "=Q"; // always promote to queen for simplicity
+    }
+
     // 0-0 for kingside castle
     // 0-0-0 for queenside castle (not implemented)
     // + for check, # for checkmate (not implemented)
-    // e.p. for en passant (not implemented)
-    // =Q, =R, =B, =N for promotion (not implemented)
     moveHistory.push(moveNotation);
   }
 }
