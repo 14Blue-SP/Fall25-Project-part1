@@ -11,8 +11,8 @@ public class Main {
     frame.setMinimumSize(new Dimension(600,600));
     frame.setLocationRelativeTo(null);
     
-    //Board board = new Board();
-    //frame.add(board);
+    Board board = new Board(frame.getWidth());
+    frame.add(board);
     
     frame.setVisible(true);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
