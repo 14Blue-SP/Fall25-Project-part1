@@ -3,6 +3,8 @@ package chess.gui;
 import java.awt.*;
 import javax.swing.*;
 
+import chess.model.CheckScanner;
+
 public class Main {
   public static void main(String[] args){
     JFrame frame = new JFrame();
@@ -13,6 +15,7 @@ public class Main {
     frame.setLocationRelativeTo(null);
     
     BoardView board = new BoardView(frame.getWidth());
+    CheckScanner.getInstance();
     frame.add(board);
     
     frame.setVisible(true);

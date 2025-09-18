@@ -99,8 +99,8 @@ public class BoardView extends JPanel implements GameModelListener {
 
   @Override
   public void gameStateChanged() {
-    //System.out.print(this.getClass().getSimpleName()+"--");
-    //System.out.println(new Throwable().getStackTrace()[0].getMethodName());
+    System.out.print(this.getClass().getSimpleName()+"--");
+    System.out.println(new Throwable().getStackTrace()[0].getMethodName());
     repaint();
   }
 }

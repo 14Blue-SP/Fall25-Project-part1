@@ -81,7 +81,16 @@ public class GameModel {
 
   public ArrayList<Piece> getPieces(){
     return pieces;
-  } 
+  }
+
+  public Piece getKing(boolean isWhite){
+    for(Piece piece : pieces){
+      if(piece.name.equals("King") && piece.isWhite == isWhite){
+        return piece;
+      }
+    }
+    return null;
+  }
 
   public void printBoard(){
     System.out.println();
@@ -101,6 +110,9 @@ public class GameModel {
     }
     if(move.piece.pieceCollision(move.col, move.row)){
       return false;
+    }
+    if(CheckScanner.getInstance().willCheck(move)){
+      //return false;
     }
     return true;
   }
