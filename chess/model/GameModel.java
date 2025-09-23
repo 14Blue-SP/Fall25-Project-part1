@@ -87,6 +87,7 @@ public class GameModel {
       }
     }
     printBoard();
+    makePieces();
   }
   //#endregion
 
