@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 import chess.model.GameModel;
+import chess.move.Move;
 import chess.pieces.Piece;
 
 import java.awt.*;
@@ -31,6 +32,7 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
     drawBoard(gfx);
     drawHoveredSquare(gfx);
     drawPieces(gfx);
+    drawSelectedPiece(gfx);
   }
 
   private void drawBoard(Graphics gfx){
@@ -66,6 +68,21 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
     }
   }
 
+  private void drawSelectedPiece(Graphics gfx){
+    Piece p = GM.selectedPiece;
+    if(p==null) {return;}
+    int spriteIndex=-1;
+    switch (Character.toLowerCase(p.type)) {
+      case 'k': spriteIndex=0; break;
+      case 'q': spriteIndex=1; break;
+      case 'b': spriteIndex=2; break;
+      case 'n': spriteIndex=3; break;
+      case 'r': spriteIndex=4; break;
+      case 'p': spriteIndex=5; break;
+    }
+    gfx.drawImage(Main.pieceSheet, p.pos[0], p.pos[1], p.pos[0]+Main.gridSize, p.pos[1]+Main.gridSize, spriteIndex*Main.imageScale, (p.isWhite? 0:1)*Main.imageScale, (spriteIndex+1)*Main.imageScale, ((p.isWhite? 0:1)+1)*Main.imageScale, getFocusCycleRootAncestor());
+  }
+
   //#region Event Listener Moves
   @Override
   public void mousePressed(MouseEvent e) {
@@ -83,14 +100,22 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
     int file = e.getX() / Main.gridSize;
     int rank = e.getY() / Main.gridSize;
 
-     if(GM.selectedPiece!=null){
-      boolean isValidMove = false;
+     if(GM.selectedPiece != null){
+      Move move = new Move(GM.selectedPiece.coord[0], GM.selectedPiece.coord[1], file, rank);
+      boolean isValidMove = true;
+
       if(isValidMove){
+        System.out.println("Making Move: "+move);
+        GM.makeMove(move);
+        GM.printBoard();
+        GM.isWhiteTurn = !GM.isWhiteTurn;
       } else {
         GM.selectedPiece.pos[0] = GM.selectedPiece.coord[0] * Main.gridSize;
         GM.selectedPiece.pos[1] = GM.selectedPiece.coord[1] * Main.gridSize;
       }
+      GM.latestMove=move;
     }
+    GM.selectedPiece=null;
     repaint();
   }
   @Override
@@ -116,8 +141,14 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
   @Override
   public void keyReleased(KeyEvent e) {
     int keyCode = e.getKeyCode();
-    if(keyCode == KeyEvent.VK_SPACE){ 
-      System.out.println("Space Pressed");
+    if(keyCode == KeyEvent.VK_SPACE){
+      if(GM.latestMove != null){
+        System.out.println("Undo Move: "+GM.latestMove);
+        GM.undoMove(GM.latestMove);
+        GM.latestMove=null;
+        GM.printBoard();
+        GM.isWhiteTurn = !GM.isWhiteTurn;
+      }
       repaint();
     }
   }

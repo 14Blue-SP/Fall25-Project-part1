@@ -9,8 +9,7 @@ public class Piece {
   public Character type;
 
   public Piece(int[] coordinates, Character piece){
-    this.coord[0] = coordinates[0];
-    this.coord[1] = coordinates[1];
+    this.coord = coordinates;
     this.pos[0] = coord[0] * Main.gridSize;
     this.pos[1] = coord[1] * Main.gridSize;
     this.type = piece;

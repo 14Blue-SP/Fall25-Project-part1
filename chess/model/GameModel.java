@@ -3,6 +3,7 @@ package chess.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import chess.move.Move;
 import chess.pieces.Piece;
 
 public class GameModel {
@@ -13,6 +14,7 @@ public class GameModel {
 
   public Piece selectedPiece=null;
   public boolean isWhiteTurn=true;
+  public Move latestMove = null;
 
   private Character[] chessBoard = new Character[files*ranks];
   private ArrayList<Piece> pieces = new ArrayList<>();
@@ -50,10 +52,7 @@ public class GameModel {
   }
 
   public int[] getCoordinates(int index){
-    int[] coords = new int[2];
-    coords[0] = index % files;
-    coords[1] = index / ranks;
-    return coords;
+    return new int[] {index % files, index / ranks};
   }
 
   public void setBoard(int file, int rank, Character piece){
@@ -79,7 +78,7 @@ public class GameModel {
       // Place queens
       setBoard(3, c%2==0 ? 7:0, c%2==0 ? 'Q':'q');
       // Place kings
-      setBoard(4, c%2==0 ? 7:0, c%2==0 ? 'K':'K');
+      setBoard(4, c%2==0 ? 7:0, c%2==0 ? 'K':'k');
       if(c%2==0){
         whiteKingIndex = getIndex(4,7);
       } else {
@@ -115,5 +114,34 @@ public class GameModel {
   }
   //#endregion
 
+  //#region Move Methods
+  public void makeMove(Move move){
+    setBoard(move.coords[2], move.coords[3], move.piece.type);
+    setBoard(move.coords[0], move.coords[1], ' ');
+    if(Character.toLowerCase(move.piece.type)=='k'){
+      if(move.piece.isWhite){
+        whiteKingIndex = getIndex(move.coords[2], move.coords[3]);
+      } else {
+        blackKingIndex = getIndex(move.coords[2], move.coords[3]);
+      }
+    }
+    //record Move
+  }
+
+  public void undoMove(Move move){
+    Character capture;
+    if(move.capture==null) {capture=' ';} else {capture=move.capture.type;}
+    setBoard(move.coords[2], move.coords[3], capture);
+    setBoard(move.coords[0], move.coords[1], move.piece.type);
+    if(Character.toLowerCase(move.piece.type)=='k'){
+      if(move.piece.isWhite){
+        whiteKingIndex = getIndex(move.coords[2], move.coords[3]);
+      } else {
+        blackKingIndex = getIndex(move.coords[2], move.coords[3]);
+      }
+    }
+    //record Move
+  }
+  //#endregion
   //
 }
