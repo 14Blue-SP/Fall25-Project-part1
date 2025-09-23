@@ -3,8 +3,10 @@ package chess;
 import java.awt.*;
 import javax.swing.*;
 
+import chess.model.GameModel;
+
 public class Main {
-  //public static GameModel GM = GameModel.getInstance();
+  public static GameModel GM = GameModel.getInstance();
   public static String[] colors = {"#1B1B1B", "#808A9F", "#F4F7F5", "#C83E4D", "#04395E", "#031D44"};
   static Image pieceSheet = new ImageIcon("src/pieces.png").getImage();
   static int imageScale = pieceSheet.getWidth(null)/6;
@@ -24,6 +26,7 @@ public class Main {
     //#endregion
 
     //#region Run Code
+    GM.newStandardChessBoard();
     //#endregion
   }
 }
