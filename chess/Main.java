@@ -10,7 +10,7 @@ public class Main {
   static int imageScale = pieceSheet.getWidth(null)/6;
   public static int gridSize=500;
 
-  public static void main(String[] args){
+  public static void main(String[] args) {
     //#region Window Code
     JFrame frame = new JFrame("SP-14 : Blue | Chess Engine");
     frame.getContentPane().setBackground(Color.decode(colors[0]));
@@ -18,7 +18,12 @@ public class Main {
     frame.setMinimumSize(new Dimension(500,500));
     frame.setResizable(false);
     frame.setLocation(0,0);
+    frame.add(new UserInterface());
     frame.setVisible(true);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    //#endregion
+
+    //#region Run Code
+    //#endregion
   }
 }
