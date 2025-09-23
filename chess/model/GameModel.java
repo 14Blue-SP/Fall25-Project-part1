@@ -1,6 +1,9 @@
 package chess.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+
+import chess.pieces.Piece;
 
 public class GameModel {
   private static GameModel INSTANCE = new GameModel();
@@ -8,7 +11,11 @@ public class GameModel {
   public int whiteKingIndex, blackKingIndex;
   public int enPassantSquare = -1;
 
-  private char[] chessBoard = new char[files*ranks];
+  public Piece selectedPiece=null;
+  public boolean isWhiteTurn=true;
+
+  private Character[] chessBoard = new Character[files*ranks];
+  private ArrayList<Piece> pieces = new ArrayList<>();
   
   //Method to get static Instance of class
   public static GameModel getInstance(){
@@ -31,9 +38,10 @@ public class GameModel {
     }
     System.out.println(str+"\n");
     //System.out.println("  a, b, c, d, e, f, g, h");
+    makePieces();
   }
 
-  public char[] getBoard(){
+  public Character[] getBoard(){
     return chessBoard;
   }
 
@@ -48,7 +56,7 @@ public class GameModel {
     return coords;
   }
 
-  public void setBoard(int file, int rank, char piece){
+  public void setBoard(int file, int rank, Character piece){
     chessBoard[getIndex(file,rank)] = piece;
   }
 
@@ -79,6 +87,30 @@ public class GameModel {
       }
     }
     printBoard();
+  }
+  //#endregion
+
+  //#region Piece Methods
+  public void makePieces(){
+    pieces.clear();
+    for(int i=0; i<chessBoard.length; i++){
+      if(!chessBoard[i].equals(' ')){
+        pieces.add(new Piece(getCoordinates(i), chessBoard[i]));
+      }
+    }
+  }
+
+  public ArrayList<Piece> getPieces(){
+    return pieces;
+  }
+
+  public Piece getPiece(int file, int rank){
+    for(Piece p : pieces){
+      if(p.coord[0]==file && p.coord[1]==rank){
+        return p;
+      }
+    }
+    return null;
   }
   //#endregion
 
