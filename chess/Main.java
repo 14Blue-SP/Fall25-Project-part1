@@ -1,8 +1,6 @@
 package chess;
 
 import java.awt.*;
-import java.util.Arrays;
-
 import javax.swing.*;
 
 import chess.model.GameModel;
@@ -31,12 +29,5 @@ public class Main {
     System.out.println("\n\tNew Game");
     GM.newStandardChessBoard();
     //#endregion
-
-    int[] s1 = {1,3};
-    int[] s2 = {3,1};
-    int[] s3 = {1,3};
-
-    System.out.println(Arrays.equals(s1,s2));
-    System.out.println(Arrays.equals(s1,s3));
   }
 }

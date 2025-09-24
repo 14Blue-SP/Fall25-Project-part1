@@ -1,11 +1,12 @@
 package chess.move;
 
 import chess.Main;
-import chess.pieces.Piece;
 
 public class Move {
   public int[] coords = new int[4];
-  public Piece piece, capture;
+  public Character piece, capture;
+  //public Piece capture;
+  public boolean isWhite;
   public String special="";
 
   public Move(int col, int row, int newCol, int newRow) {
@@ -13,8 +14,11 @@ public class Move {
     coords[1]=row;
     coords[2]=newCol;
     coords[3]=newRow;
-    piece = Main.GM.getPiece(col, row);
-    capture = Main.GM.getPiece(newCol, newRow);
+    piece = Main.GM.getBoard()[Main.GM.getIndex(col, row)];
+    capture = Main.GM.getBoard()[Main.GM.getIndex(newCol, newRow)];
+    isWhite = Character.isUpperCase(piece);
+    //piece = Main.GM.getPiece(col, row);
+    //capture = Main.GM.getPiece(newCol, newRow);
   }
 
   public boolean isValidMove(){
@@ -27,8 +31,6 @@ public class Move {
 
   @Override
   public String toString() {
-    Character capture;
-    if(this.capture==null){capture = ' ';} else {capture = this.capture.type;}
     String str = String.format("%d%d%d%d%c", coords[0], coords[1], coords[2], coords[3], capture);
     return str;
   }
