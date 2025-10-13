@@ -1,19 +1,15 @@
 package chess.pieces;
 
-import chess.gui.BoardView;
+import chess.move.Move;
 
 public class Knight extends Piece {
-  public Knight(BoardView board, int col, int row, boolean isWhite){
-    super(col, row, isWhite);
-    this.xPos = col * board.tileSize;
-    this.yPos = row * board.tileSize;
-    this.name = "Knight";
-    this.value = 3;
-    this.spriteIndex = 3;
+  public Knight(boolean isWhite) {
+    super("knight", isWhite, 300);
+    spriteIndex = 3;
   }
 
   @Override
-  public boolean isValidMove(int col, int row){
-    return Math.abs(this.col - col) * Math.abs(this.row - row) == 2;
+  public boolean isValidMove(Move move) {
+    return Math.abs(move.initial.col-move.target.col) * Math.abs(move.initial.row-move.target.row)==2;
   }
 }

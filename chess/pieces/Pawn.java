@@ -1,53 +1,41 @@
 package chess.pieces;
 
-import chess.gui.BoardView;
 import chess.model.GameModel;
+import chess.move.Move;
 
 public class Pawn extends Piece {
-  public Pawn(BoardView board, int col, int row, boolean isWhite){
-    super(col, row, isWhite);
-    this.board = board;
-    this.xPos = col * board.tileSize;
-    this.yPos = row * board.tileSize;
-    this.name = "Pawn";
-    this.value = 1;
-    this.spriteIndex = 5;
+  public int dir;
+  public Pawn(boolean isWhite) {
+    dir = isWhite ? -1:1;
+    super("pawn", isWhite, 100);
   }
 
   @Override
-  public boolean isValidMove(int col, int row){
-    int direction = this.isWhite ? -1 : 1;
+  public boolean isValidMove(Move move) {
+    //Promotion
+    if(move.target.row==((isWhite==GameModel.getInstance().playerIsWhite) ? 0:7)){
+      move.special = "=";
+    }
 
-    // standard move
-    if(this.col == col && this.row + direction == row && GameModel.getInstance().getPieceAt(col, row) == null){
+    // Standard Move
+    if(move.initial.col==move.target.col && move.target.row==move.initial.row+dir && board.getElement(move.target.col, move.target.row).isEmpty()){
       return true;
     }
-    // first double move
-    if(this.isFirstMove && this.col == col && this.row + 2 * direction == row && GameModel.getInstance().getPieceAt(col, row) == null){
-      return true;
-    }
-    // capture move
-    if(Math.abs(this.col - col) == 1 && this.row + direction == row && GameModel.getInstance().getPieceAt(col, row) != null){
-      return true;
-    }
-    // en passant
-    if(GameModel.getInstance().enPassantSquare == GameModel.getInstance().getIndex(col, row)
-    && Math.abs(this.col - col) == 1 && this.row + direction == row){
-      return true;
-    }
-    return false;
-  }
 
-  @Override
-  public boolean pieceCollision(int col, int row){
-    if(this.col == col){
-      int start = Math.min(this.row, row)+1;
-      int end = Math.max(this.row, row);
-      for(int r = start; r < end; r++){
-        if(GameModel.getInstance().getPieceAt(col, r) != null){
-          return true;
-        }
-      }
+    // First Double Move
+    if (move.initial.row==((isWhite==GameModel.getInstance().playerIsWhite) ? 6:1) && move.initial.col==move.target.col && move.target.row==move.initial.row+2*dir && board.getElement(move.target.col, move.target.row).isEmpty() && board.getElement(move.target.col, move.target.row-dir).isEmpty()) {
+      return true;
+    }
+
+    // Capture
+    if (Math.abs(move.initial.col-move.target.col)==1 && move.target.row==move.initial.row+dir && !board.getElement(move.target.col, move.target.row).isEmpty()) {
+      return true;
+    }
+
+    //enPassant
+    if(board.enPassant==move.target && move.initial.row!=((isWhite==GameModel.getInstance().playerIsWhite)?6:1) && Math.abs(move.initial.col-move.target.col)==1 && move.target.row==move.initial.row+dir){
+      move.special="e.p.";
+      return true;
     }
     return false;
   }
