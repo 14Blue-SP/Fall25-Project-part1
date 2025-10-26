@@ -135,7 +135,7 @@ public class BoardModel {
               move.special = "="+prom.charAt(j);
               square.piece.moves.add(move);
             }
-            break;
+            continue;
           }
         }
         square.piece.moves.add(move);
@@ -241,20 +241,20 @@ public class BoardModel {
     }
     if (move.target.piece instanceof Rook) {
       if (!move.isWhite) {
-        if (move.initial.col==(playerIsWhite ? 0:7) && move.initial.row==(playerIsWhite ? 7:0)) {
+        if (move.target.col==(playerIsWhite ? 0:7) && move.target.row==(playerIsWhite ? 7:0)) {
           if (playerIsWhite) {castle[0]=false;}
           else {castle[1]=false;}
         }
-        if (move.initial.col==(playerIsWhite ? 7:0) && move.initial.row==(playerIsWhite ? 7:0)) {
+        if (move.target.col==(playerIsWhite ? 7:0) && move.target.row==(playerIsWhite ? 7:0)) {
           if (playerIsWhite) {castle[1]=false;}
           else {castle[0]=false;}
         }
       } else {
-        if (move.initial.col==(playerIsWhite ? 0:7) && move.initial.row==(playerIsWhite ? 0:7)) {
+        if (move.target.col==(playerIsWhite ? 0:7) && move.target.row==(playerIsWhite ? 0:7)) {
           if (playerIsWhite) {castle[2]=false;}
           else {castle[3]=false;}
         }
-        if (move.initial.col==(playerIsWhite ? 7:0) && move.initial.row==(playerIsWhite ? 0:7)) {
+        if (move.target.col==(playerIsWhite ? 7:0) && move.target.row==(playerIsWhite ? 0:7)) {
           if (playerIsWhite) {castle[3]=false;}
           else {castle[2]=false;}
         }

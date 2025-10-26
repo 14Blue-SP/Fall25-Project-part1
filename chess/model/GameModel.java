@@ -90,7 +90,7 @@ public class GameModel {
   public List<Move> sortMoves(List<Move> list) {
     for (Move move : list) {
       boardModel.makeMove(move);
-      move.score = Scorer.score(-1, 0);
+      move.score = Scorer.score(-1, 0)*(list.getFirst().isWhite ? 1:-1);
       boardModel.undoMove(move);
     }
     Collections.sort(list, (m1,m2) -> Integer.compare(m1.score, m2.score));
@@ -107,13 +107,12 @@ public class GameModel {
     //if(depth==Const.MAX_DEPTH)System.out.println("depth: "+depth +"|"+list);
     for (Move iteration : list) {
       boardModel.makeMove(iteration);
-      int bestScore;
-      if (isMaximizingPlayer) 
-      {bestScore = MinMax(depth-1, min, max, iteration, false).score;}
-      else {bestScore = MinMax(depth-1, min, max, iteration, true).score;}
+      isMaximizingPlayer = !isMaximizingPlayer;
+      System.err.println("score: "+iteration.score);
+      int bestScore = MinMax(depth-1, min, max, iteration, isMaximizingPlayer).score; System.err.println(bestScore);
       boardModel.undoMove(iteration);
 
-      if (!isMaximizingPlayer) {
+      if (isMaximizingPlayer) {
         min = Math.min(min, bestScore);
         if (depth == Const.MAX_DEPTH) { move = iteration; }
 
@@ -125,8 +124,8 @@ public class GameModel {
         if (min>=max) {break;}
       }
     }
-    if (isMaximizingPlayer) {return new MinMaxMove(move, max); }
-    else { return new MinMaxMove(move, min); }
+    if (isMaximizingPlayer) {return new MinMaxMove(move, min); }
+    else { return new MinMaxMove(move, max); }
   }
 
   public void getState(){

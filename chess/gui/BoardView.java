@@ -24,8 +24,8 @@ public class BoardView extends JPanel implements MouseListener, MouseMotionListe
     addMouseListener(this);
     addMouseMotionListener(this);
     addKeyListener(this);
-    board = GameModel.getInstance().getBoardModel();
-    GameModel.getInstance().newGame();
+    board = GM.getBoardModel();
+    GM.newGame();
   }
 
   @Override
