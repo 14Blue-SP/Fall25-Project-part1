@@ -359,6 +359,7 @@ public class BoardModel {
     boolean[] checks = GameModel.getInstance().checks;
     checks[0]=CS.isCheck(true);
     checks[1]=CS.isCheck(false);
+    if(GameModel.getInstance().getMoves().isEmpty()) {return 0;}
     if (checks[0] && !GameModel.getInstance().getMoves().getFirst().isWhite){
       GameModel.getInstance().getMoves().getFirst().isCheck=true;
     }

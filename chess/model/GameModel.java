@@ -43,6 +43,7 @@ public class GameModel {
     }
     boardModel.newStandardChessBoard();
     if (!playerIsWhite) {boardModel.flipBoard();}
+    Scorer.FlipTables();
   }
 
   public void nextTurn() {
