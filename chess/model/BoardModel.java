@@ -159,18 +159,6 @@ public class BoardModel {
   public void makeMove(Move move) {
     // Pawn special move cases
     if (move.initial.piece instanceof Pawn) {
-      if (move.special.startsWith("=")) {
-        Piece promPiece=null;
-        char promChar = move.special.charAt(move.special.length()-1);
-        switch (promChar) {
-          case 'Q': promPiece=new Queen(move.isWhite); break;
-          case 'N': promPiece=new Knight(move.isWhite); break;
-          case 'B': promPiece=new Bishop(move.isWhite); break;
-          case 'R': promPiece=new Rook(move.isWhite); break;
-        }
-        promPiece.moves = move.initial.piece.moves;
-        move.initial.piece = promPiece;
-      }
       if (!(move.initial.piece instanceof Pawn)) {return;}
       Pawn p = (Pawn)(move.initial.piece);
       int direction = p.dir;
@@ -184,6 +172,18 @@ public class BoardModel {
         enPassant = getElement(move.target.col, move.target.row-direction);
       } else {
         enPassant = null;
+      }
+      if (move.special.startsWith("=")) {
+        Piece promPiece=null;
+        char promChar = move.special.charAt(move.special.length()-1);
+        switch (promChar) {
+          case 'Q': promPiece=new Queen(move.isWhite); break;
+          case 'N': promPiece=new Knight(move.isWhite); break;
+          case 'B': promPiece=new Bishop(move.isWhite); break;
+          case 'R': promPiece=new Rook(move.isWhite); break;
+        }
+        promPiece.moves = move.initial.piece.moves;
+        move.initial.piece = promPiece;
       }
     }
 
@@ -263,6 +263,15 @@ public class BoardModel {
   }
 
   public void undoMove(Move move){
+    // Promotion
+    if(move.special.startsWith("=")){
+      move.initial.piece=new Pawn(move.isWhite);
+      if (!GameModel.getInstance().playerIsWhite) {
+        Pawn p = (Pawn)(move.initial.piece);
+        p.dir*=-1;
+      }
+    }
+
     // update Board
     setElement(move.initial);
     setElement(move.target);
@@ -278,26 +287,24 @@ public class BoardModel {
 
     // Undo Pawn Move special cases
     if (move.initial.piece instanceof Pawn) {
-      Pawn p = (Pawn)(move.initial.piece);
-      int direction = p.dir;
-      // Promotion
-      if(move.special.startsWith("=")){
-        move.initial.piece=GameModel.getInstance().getMoves().get(1).initial.piece;
-      }
-
       // enPassant
       if(move.special.equals("e.p.")){
+        Pawn p = (Pawn)(move.initial.piece);
+        int direction = p.dir;
         getElement(move.target.col, move.target.row-direction).piece=move.target.piece;
         getElement(move.target.col, move.target.row).piece=null;
       }
 
       // Update enPassant square
       Move prevMove = GameModel.getInstance().getMoves().isEmpty() ? null : GameModel.getInstance().getMoves().getFirst();
-      getElement(move.target.col, move.target.row-direction);
-      if(prevMove!=null && Math.abs(prevMove.target.row-prevMove.initial.row)==2) {
-        enPassant = getElement(prevMove.target.col, prevMove.target.row+direction);
-      } else {
-        enPassant = null;
+      if(prevMove!=null && prevMove.initial.piece instanceof Pawn) {
+        Pawn p = (Pawn)(prevMove.initial.piece);
+        int direction = p.dir;
+        if (Math.abs(prevMove.target.row-prevMove.initial.row)==2) {
+          enPassant = getElement(prevMove.target.col, prevMove.target.row-direction);
+        } else {
+          enPassant = null;
+        }
       }
     }
 

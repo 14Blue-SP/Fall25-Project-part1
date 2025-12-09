@@ -96,15 +96,13 @@ public class Scorer {
   //#endregion
 
   public static int score(int numMoves, int depth) {
-    int score=0, material=calculateMaterial(true);
+    int score=0;
+    score += calculateMaterial();
     score += calculateAttack(true);
-    score += material;
-    score += calculateMoveability(numMoves, depth, material, true);
+    score += calculateMoveability(numMoves, depth, true);
     score += calculatePosition(true);
-    material=calculateMaterial(false);
     score -= calculateAttack(false);
-    score += material;
-    score -= calculateMoveability(numMoves, depth, material, false);
+    score -= calculateMoveability(numMoves, depth, false);
     score -= calculatePosition(false);
     return -(score + depth*50);
   }
@@ -112,34 +110,47 @@ public class Scorer {
   public static int calculateAttack(boolean isWhite) {
     BoardModel board = GameModel.getInstance().getBoardModel();
     int score=0;
-    Square temp = board.whiteKing;
     for (int i = 0; i < board.getBoard().length; i++) {
       Square square = board.getBoard()[i]; 
       if (square.isEmpty()) { continue; }
       if (square.piece.isWhite == isWhite) {
+        boolean attacked = checkSpace(board, isWhite, square);
         switch (square.piece.name) {
-          case "pawn": {board.whiteKing=square; if(board.CS.isCheck(true)){score -= 65;}} break;
-          case "knight": {board.whiteKing=square; if(board.CS.isCheck(true)){score -= 300;}} break;
-          case "bishop": {board.whiteKing=square; if(board.CS.isCheck(true)){score -= 300;}} break;
-          case "rook": {board.whiteKing=square; if(board.CS.isCheck(true)){score -= 500;}} break;
-          case "queen": {board.whiteKing=square; if(board.CS.isCheck(true)){score -= 900;}} break;
+          case "pawn": {if(attacked){score -= 65;}} break;
+          case "knight": {if(attacked){score -= 300;}} break;
+          case "bishop": {if(attacked){score -= 300;}} break;
+          case "rook": {if(attacked){score -= 500;}} break;
+          case "queen": {if(attacked){score -= 900;}} break;
         }
       }
     }
-    board.whiteKing = temp;
     if (board.CS.isCheck(isWhite)){score -= 200;}
     return score/2;
   }
 
-  public static int calculateMaterial(boolean isWhite) {
+  private static boolean checkSpace(BoardModel board, boolean isWhite, Square square) {
+    Square temp = isWhite ? board.whiteKing:board.blackKing;
+    if (isWhite) {
+      board.whiteKing = square;
+    } else {
+      board.blackKing = square;
+    }
+    boolean safe = board.CS.isCheck(isWhite);
+    if (isWhite) {
+      board.whiteKing = temp;
+    } else {
+      board.blackKing = temp;
+    }
+    return safe;
+  }
+
+  public static int calculateMaterial() {
     BoardModel board = GameModel.getInstance().getBoardModel();
     int score=0;
     for (int i=0; i<board.getBoard().length; i++) {
       Square square = board.getBoard()[i];
       if (!square.isEmpty()) {
-        if (square.piece.isWhite == isWhite) {
-          score += square.piece.value;
-        }
+        score += square.piece.value;
       }
     }
     return score;
@@ -168,7 +179,7 @@ public class Scorer {
     return score;
   }
 
-  public static int calculateMoveability(int numMoves, int depth, int material, boolean isWhite) {
+  public static int calculateMoveability(int numMoves, int depth, boolean isWhite) {
     int state = GameModel.getInstance().getBoardModel().getState();
     int score = 0;
     score+=numMoves*5;

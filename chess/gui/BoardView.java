@@ -44,6 +44,7 @@ public class BoardView extends JPanel implements MouseListener, MouseMotionListe
       if (GM.isPlaying && (GM.whiteToMove==!GM.playerIsWhite)) {
         Square s = GM.getBoardModel().getElement(0, 0);
         GM.makeMove((GM.MinMax(Const.MAX_DEPTH, Integer.MAX_VALUE, Integer.MIN_VALUE, new Move(s,s), GM.whiteToMove)));
+        System.out.println("Computer has moved. "+GM.getMoves().getFirst());
         GM.nextTurn();
         repaint();
       }
@@ -130,8 +131,10 @@ public class BoardView extends JPanel implements MouseListener, MouseMotionListe
         }
         GM.makeMove(move);
         GM.nextTurn();
+        //GM.getBoardModel().printBoard();
       }
     }
+    selectedSquare.piece.moves.clear();
     selectedSquare = null;
     repaint();
   }

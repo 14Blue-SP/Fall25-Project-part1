@@ -91,11 +91,10 @@ public class GameModel {
   public List<Move> sortMoves(List<Move> list) {
     for (Move move : list) {
       boardModel.makeMove(move);
-      move.score = Scorer.score(-1, 0)*(list.getFirst().isWhite ? 1:-1);
+      move.score = Scorer.score(-1, 0)*(move.isWhite ? 1:-1);
       boardModel.undoMove(move);
     }
-    Collections.sort(list, (m1,m2) -> Integer.compare(m1.score, m2.score));
-    //if (!list.getFirst().isWhite) { return list.reversed(); }
+    Collections.sort(list, (m2,m1) -> Integer.compare(m1.score, m2.score));
     return list;
   }
 
@@ -103,29 +102,26 @@ public class GameModel {
     List<Move> list = boardModel.getPossibleMoves(isMaximizingPlayer);
     if (depth == 0 || list.isEmpty()) {return new MinMaxMove(move, Scorer.score(list.size(), depth)*(isMaximizingPlayer ? 1:-1));}
 
+    Collections.shuffle(list);
     // sort moves by score value
     list = sortMoves(list);
-    //if(depth==Const.MAX_DEPTH)System.out.println("depth: "+depth +"|"+list);
+    //isMaximizingPlayer = !isMaximizingPlayer;
     for (Move iteration : list) {
       boardModel.makeMove(iteration);
-      isMaximizingPlayer = !isMaximizingPlayer;
-      System.err.println("score: "+iteration.score);
-      int bestScore = MinMax(depth-1, min, max, iteration, isMaximizingPlayer).score; System.err.println(bestScore);
+      int bestScore = MinMax(depth-1, min, max, iteration, !isMaximizingPlayer).score;
       boardModel.undoMove(iteration);
 
-      if (isMaximizingPlayer) {
+      if (!isMaximizingPlayer) {
         min = Math.min(min, bestScore);
         if (depth == Const.MAX_DEPTH) { move = iteration; }
-
-        if (min<=max) {break;}
       } else {
         max = Math.max(max, bestScore);
         if (depth == Const.MAX_DEPTH) { move = iteration; }
-
-        if (min>=max) {break;}
       }
+      if (max>=min) {break;}
     }
-    if (isMaximizingPlayer) {return new MinMaxMove(move, min); }
+    //System.err.println("depth: "+depth +"| player: "+isMaximizingPlayer +"| min: "+min+"| max: "+max);
+    if (!isMaximizingPlayer) {return new MinMaxMove(move, min); }
     else { return new MinMaxMove(move, max); }
   }
 
